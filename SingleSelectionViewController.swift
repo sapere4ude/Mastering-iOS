@@ -28,13 +28,28 @@ class SingleSelectionViewController: UIViewController {
    
    @IBOutlet weak var listTableView: UITableView!
    
-   func selectRandomCell() {
-      
-   }
+    func selectRandomCell() {
+        let section = Int(arc4random_uniform(UInt32(list.count)))
+        let row = Int(arc4random_uniform(UInt32(list[section].countries.count)))
+        let targetIndexPath = IndexPath(row: row, section: section)
+        
+        // 특정 cell을 선택할때 사용하는 메서드
+        listTableView.selectRow(at: targetIndexPath, animated: true, scrollPosition: .top)
+    }
    
-   func deselect() {
-      
-   }
+    func deselect() {
+        if let selected = listTableView.indexPathForSelectedRow {
+            listTableView.deselectRow(at: selected, animated: true)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                [weak self] in
+                let first = IndexPath(row: 0, section: 0)
+                self?.listTableView.scrollToRow(at: first, at: .top, animated: true)
+            }
+            
+        }
+    
+    }
    
    override func viewDidLoad() {
       super.viewDidLoad()
@@ -91,7 +106,47 @@ extension SingleSelectionViewController: UITableViewDataSource {
 
 
 extension SingleSelectionViewController: UITableViewDelegate {
-   
+    // cell이 선택되기 전에 호출, 메소드에서 indexPath를 리턴하면 cell이 선택됨. 주로 특정 cell의 클릭을 금지할때 사용
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        if indexPath.row == 0 {
+            return nil
+        }
+        return indexPath
+    }
+    // cell이 선택된 뒤에 호출. 선택된 cell은 indexPath를 통해 확인할 수 있음
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let target = list[indexPath.section].countries[indexPath.row]
+        showAlert(with: target)
+        
+        tableView.cellForRow(at: indexPath)?.textLabel?.textColor = UIColor.black
+        
+        print("selected\(indexPath)")
+    }
+    
+    // 선택된 cell을 선택해제하기 전에 호출. indexPath를 리턴하면 선택된 셀이 호출됨. nil을 리턴하면 선택된 cell을 그대로 유지
+    func tableView(_ tableView: UITableView, willDeselectRowAt indexPath: IndexPath) -> IndexPath? {
+        return indexPath
+    }
+    
+    // 선택되었던 cell이 선택해제될때 호출됨
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        print("deselected\(indexPath)")
+    }
+    
+    // cell을 강조하기 전에 호출
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return indexPath.row != 0
+        
+    }
+    
+    // cell이 강조된 이후에 호출
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+    }
+    
+    // 강조 효과가 제거된 이후에 호출
+    func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        
+    }
 }
 
 
@@ -107,10 +162,19 @@ extension UIViewController {
 }
 
 class SingleSelectionCell: UITableViewCell {
-   override func awakeFromNib() {
-      super.awakeFromNib()
-      
-   }
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        textLabel?.textColor = UIColor(white: 217.0/255.0, alpha: 1.0)
+        textLabel?.highlightedTextColor = UIColor.black
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setSelected(highlighted, animated: animated)
+    }
 }
 
 

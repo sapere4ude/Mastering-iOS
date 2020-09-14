@@ -23,7 +23,7 @@
 import Foundation
 
 class Region {
-   let title: String
+   let title: String    // 첫문자 영문으로 정리
    var countries: [String]
    
    init(title: String, countries: [String]) {

@@ -84,6 +84,28 @@ extension RowActionViewController: UITableViewDataSource {
 
 
 extension RowActionViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let emailAction = UITableViewRowAction(style: .default, title: "Email") { [weak self] (action, indexPath) in
+            if let data = self?.list[indexPath.row] {
+                self?.sendEmail(with: data)
+            }
+        }
+        
+        emailAction.backgroundColor = UIColor.black
+        
+        let messageAction = UITableViewRowAction(style: .normal, title: "SMS") { [weak self] (action, indexPath) in
+            if let data = self?.list[indexPath.row] {
+                self?.sendMessage(with: data)
+            }
+        }
+        
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (action, indexPath)
+            in
+            self?.delete(at: indexPath)
+        }
+        
+        return [deleteAction, messageAction, emailAction]   // 버튼이 오른쪽에서부터 쌓이는걸 확인할 수 있음
+    }
    
 }
 

@@ -31,6 +31,9 @@ class SectionHeaderAndFooterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let headerNib = UINib(nibName: "customHeader", bundle: nil)
+        
+        listTableView.register(headerNib, forHeaderFooterViewReuseIdentifier: "header")
     }
 }
 
@@ -53,15 +56,44 @@ extension SectionHeaderAndFooterViewController: UITableViewDataSource {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return list[section].title
-    }
-    
-    
 }
 
 extension SectionHeaderAndFooterViewController: UITableViewDelegate {
     
+    // cellForRowAt 하고 비슷한 방식
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header") as! CustomHeaderView
+        
+        headerView.titleLabel.text = list[section].title
+        headerView.countLabel.text = "\(list[section].countries.count)"
+        
+//        headerView?.textLabel?.text = list[section].title
+//        headerView?.detailTextLabel?.text = "Lorem Ipsum"   // tableView style이 group일때만 실행됨
+        
+        //headerView?.backgroundColor = UIColor.darkGray
+        
+        return headerView
+    }
+    
+    // 시각적인 속성과 관련된 메서는 이 안에서 설정해줄것
+//    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+//        if let headerView = view as? UITableViewHeaderFooterView {
+////            if headerView.backgroundView == nil {
+////                let v = UIView(frame: .zero)            // 새로운 뷰를 생성해주고 그것에다가 색상을 지정해주는 방식. headerView자체에다가 넣어주면 오류남
+////                v.backgroundColor = UIColor.darkGray
+////                v.isUserInteractionEnabled = false      // 터치X 방식으로 바꾸는 것
+////                headerView.backgroundView = v
+////            }
+//            headerView.backgroundView?.backgroundColor = UIColor.darkGray
+//
+//            headerView.textLabel?.textColor = UIColor.white
+//            headerView.textLabel?.textAlignment = .center
+//        }
+//    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 80
+    }
 }
 
 
